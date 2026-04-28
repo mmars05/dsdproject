@@ -62,7 +62,7 @@ begin
                         fft_tdata <= (others => '0'); -- Clear all bits
                         fft_tdata(23 downto 0) <= audio_buffer(to_integer(rd_ptr));
                         
-                        if rd_ptr = 1023 then
+                        if rd_ptr = 255 then
                             fft_tlast <= '1'; -- Signal last sample in the block
                             state <= IDLE;
                         else
