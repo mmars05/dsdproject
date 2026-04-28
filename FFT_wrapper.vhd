@@ -31,7 +31,7 @@ end entity;
 
 architecture rtl of fft_wrapper is
 
-  constant FRAME_SIZE : integer := 1024;
+  constant FRAME_SIZE : integer := 256;
 
   -- FFT config channel
   signal cfg_tdata  : std_logic_vector(23 downto 0) := (others => '0');
