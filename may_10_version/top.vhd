@@ -14,7 +14,8 @@ entity top is
         VGA_green : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         VGA_blue : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         VGA_hsync : OUT STD_LOGIC;
-        VGA_vsync : OUT STD_LOGIC
+        VGA_vsync : OUT STD_LOGIC;
+        LED : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
 end top;
 
@@ -22,7 +23,7 @@ architecture Behavioral of top is
 
     signal CLK22MHZ : STD_LOGIC;
     signal clk_pixel : STD_LOGIC;
-    signal current_sample : UNSIGNED(23 downto 0);
+    signal current_sample : signed(23 downto 0);
     signal sample_done : STD_LOGIC;
 
     -- buffer -> wrapper signals
@@ -58,7 +59,7 @@ architecture Behavioral of top is
             CLK22MHZ    : in  STD_LOGIC;
             JA9, JA8, JA7 : out STD_LOGIC;
             JA10        : in  STD_LOGIC;
-            sample_out  : out UNSIGNED(23 downto 0);
+            sample_out  : out signed(23 downto 0);
             sample_done : out STD_LOGIC
         );
     end component;
@@ -134,13 +135,69 @@ architecture Behavioral of top is
 
     component plotgen is
         port(
+            vsync_plot : IN STD_LOGIC;
             row, col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             red, green, blue : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-            data : IN fft_bin_array_t
+            data : IN mag_array_t
         );
     end component;
     
+    SIGNAL vsync_signal : STD_LOGIC;
+    
+    component mag_ema_buffer is
+    port(
+        clk        : in  STD_LOGIC;
+        rst        : in  STD_LOGIC;
+        frame_done : in  STD_LOGIC;
+        bin_in     : in  fft_bin_array_t;
+        mag_out    : out mag_array_t
+    );
+    end component;
+    
+    SIGNAL MAG_output : mag_array_t;
+    
+    signal sample_done_meta : std_logic := '0';
+    signal sample_done_sync : std_logic := '0';
+    
+    signal por_count : unsigned(7 downto 0) := (others => '0');
+    signal sys_rst   : std_logic := '1';
+    
+    signal halt_latch : std_logic_vector(3 downto 0) := (others => '0');
+    
 begin
+    process(CLK100MHZ)
+    begin
+        if rising_edge(CLK100MHZ) then
+            if event_tlast_missing    = '1' then halt_latch(0) <= '1'; end if;
+            if event_tlast_unexpected = '1' then halt_latch(1) <= '1'; end if;
+            if event_status_halt      = '1' then halt_latch(2) <= '1'; end if;
+            if event_data_in_halt     = '1' then halt_latch(3) <= '1'; end if;
+        end if;
+    end process;
+
+LED <= halt_latch;
+
+    process(CLK100MHZ)
+    begin
+        if rising_edge(CLK100MHZ) then
+            sample_done_meta <= sample_done;
+            sample_done_sync <= sample_done_meta;
+        end if;
+    end process;
+
+    process(CLK100MHZ)
+    begin
+        if rising_edge(CLK100MHZ) then
+            if por_count < 255 then
+                por_count <= por_count + 1;
+                sys_rst   <= '1';
+            else
+                sys_rst   <= '0';
+            end if;
+        end if;
+    end process;
+
+    VGA_vsync <= vsync_signal;
     --------------------------------------------------------------------
     -- Clock generation
     --------------------------------------------------------------------
@@ -163,7 +220,7 @@ begin
             pixel_row => S_pixel_row,
             pixel_col => S_pixel_col,
             hsync => VGA_hsync,
-            vsync => VGA_vsync
+            vsync => vsync_signal
         );   
     --------------------------------------------------------------------
     -- I2S audio input (current sample --> FFT Wrapper sample in)
@@ -182,12 +239,12 @@ begin
     --------------------------------------------------------------------
     -- FFT wrapper (sample_done -> sample valid; fft_re/im_out -> vga_buffer re_out)
     --------------------------------------------------------------------
-    fft_inst : fft_wrapper
+     fft_inst : fft_wrapper
         port map (
             clk                     => CLK100MHZ,
-            rst                     => '0',
+            rst                     => sys_rst,
             sample_in               => std_logic_vector(current_sample),
-            sample_valid            => sample_done,
+            sample_valid => sample_done_sync,  -- was sample_done
             sample_ready            => fft_sample_ready,
             fft_re_out              => fft_re_out,
             fft_im_out              => fft_im_out,
@@ -200,7 +257,7 @@ begin
             event_status_halt       => event_status_halt,
             event_data_in_halt      => event_data_in_halt,
             event_data_out_halt     => event_data_out_halt
-        );
+        ); 
 
     --------------------------------------------------------------------
     -- VGA OUTPUT WRAPPER
@@ -209,7 +266,7 @@ begin
     vga_buffer_inst: vga_buffer
         port map(
             clk => CLK100MHZ,
-            rst => '0',
+            rst => sys_rst,
             
             fft_re_in => fft_re_out,
             fft_im_in => fft_im_out,
@@ -227,11 +284,21 @@ begin
     
     plot_generator : plotgen 
         port map(
+            vsync_plot => vsync_signal,
             row => S_pixel_row,
             col => S_pixel_col,
             red => input_red,
             green => input_green,
             blue => input_blue,
-            data => vga_fft_output
+            data => MAG_output
+        );
+        
+    ema : mag_ema_buffer
+        port map(
+            clk => CLK100MHZ,
+            rst => sys_rst,
+            frame_done => fft_frame_done,
+            bin_in => vga_fft_output,
+            mag_out => MAG_output
         );
 end Behavioral;
