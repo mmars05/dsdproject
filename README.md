@@ -21,17 +21,26 @@ Corresponding Frequency Domain Example:
 
 The peaks of the frequency domain indicate which frequencies are prevalent within our time domain signal.  The tallest peak in our frequency domain represents the **fundamental frequency** whereas the lower ones often represent unwanted subharmonic frequencies within the same signal. FFT effectiveness is dependent on the sampling frequency, block length and resolution.   Sampling frequency must be twice the highest frequency of interest, otherwise aliasing occurs causing distorted signals.  Larger FFT blocks enable finer resolution allowing for better distinction between closely spaced frequencies at the expense of time and computational power.
 
-### System Block Diagram 
+**Hardware Used**
+- Nexys-A7 FPGA
+- FFT IP Core
+- I2S PMOD Interface
+- VGA Monitor
+- Vivado & Simulation
+- VHDL
+
+### System Diagram 
+<img width="492" height="218" alt="Screenshot 2026-05-13 092116" src="https://github.com/user-attachments/assets/4d3b3068-f53d-4248-8981-96f9a8e54b5e" />
 
 ## Challenges
 Our group faced a multitude of difficulties during this project which lead to our final design.  As this project was highly conceptual it took several days of research along with subseqent signal processing studying in order to better understand our system. Here are the main challenges faced:
-- Pmod Troubleshooting
-- Compiling and programming
-- Magnitude Scaling
-- Windowing/Filtering
-- Packaging
-- Implementing 800x600 VGA display
+- Real/Imaginary packing
+- Clock synchronization
+- Noise in FFT output
+- VGA timings
+
 
 Regardless of these challenges it was important for us to learn how to tackle each aspect.  By iterating through each process as a group it helped to bolster some of our teamwork skills along with FPGA design and VHDL code implementation.  These challenges also helped us to learn more about different the peripheral Pmod I2S as well as the IP Catalog incorporated in Vivado.
-## Results
+
 ## Conclusion
+Overall our group believes that we adopted a real-time FFT processing implementation, by taking advantage of the FFT IP nested in Vivado we were able to display our code on a VGA after much simulation and hardware testing.  Some noise was present but overall the frequency peaks were visible indicating that our FFT acted as desired.
