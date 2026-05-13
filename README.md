@@ -54,12 +54,12 @@ Overall our group believes that we adopted a real-time FFT processing implementa
 
 Timeline
 
-Week 1: Research PMOD, FFT, VGA
-Week 2: I2S Implementation 
-Week 3: FFT Wrapper Implemntation 
-Week 4: Research FFT IP
-Week 5: VGA Implementation
-Week 6: Filtering and Debugging
-Week 7: Final touch ups 
+- Week 1: Research PMOD, FFT, VGA
+- Week 2: I2S Implementation 
+- Week 3: FFT Wrapper Implemntation 
+- Week 4: Research FFT IP
+- Week 5: VGA Implementation
+- Week 6: Filtering and Debugging
+- Week 7: Final touch ups 
 
 Conclusively we are satisfied with the turnout of this project and hope that those who read it over learn more about signal processing and FPGA design.
