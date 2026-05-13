@@ -1,2 +1,37 @@
-# dsdproject
-This GitHub contains a Stevens affilicated design project using hardware description language VHDL. The focus of our final design was to implement a live Fast-Fourier Transform on the Nexus-A7100T FPGA.
+# Fast Fourier Transform - CPE 487 Final 
+This GitHub contains a Stevens affiliated design project using hardware description language VHDL. The focus of our final design was to implement a live Fast-Fourier Transform on the Nexus-A7100T FPGA.
+
+*By Zain Choudhry, Matthew Marseglia, and Nick Herrmann* 
+## Introduction
+For our final project our group chose to work in the signal processing realm and create a live **256 point Fast-Fourier Transform** in order to merge our understand from a course within the electrical engineering ciriculum EE448 to system design in CPE-487.  Ideally our project serves as an educational backing for ourselves as we continue studying signal processing. It also will be for others who may be interested in seeing the importance of a frequency spectrum.  The project allowed us to test our current knowledge of VHDL while also expanding on the concept behind an FFT.  
+
+<img width="2880" height="2160" alt="IMG_5173" src="https://github.com/user-attachments/assets/6290ad85-49ea-4c58-a092-762d0feacd34" />
+
+**What is an FFT?**
+
+The fast-fourier transform is a fundamental mathematical technique used in, but not limited to, signal processing, data analysis and image processing.  The FFT is an algorithm for transforming time-domain data into its frequency-domain representation.  The FFT allows engineers to analyze frequency components of a signal. 
+
+Time-Domain Example:
+
+<img width="556" height="279" alt="Screenshot 2026-05-13 091348" src="https://github.com/user-attachments/assets/7f99de12-6d7c-453a-938e-046a5ce5ec19" />
+
+Corresponding Frequency Domain Example:
+
+<img width="556" height="266" alt="Screenshot 2026-05-13 091503" src="https://github.com/user-attachments/assets/c54b0c3d-ea03-4091-97a7-0ea79cc7eb74" />
+
+The peaks of the frequency domain indicate which frequencies are prevalent within our time domain signal.  The tallest peak in our frequency domain represents the **fundamental frequency** whereas the lower ones often represent unwanted subharmonic frequencies within the same signal. FFT effectiveness is dependent on the sampling frequency, block length and resolution.   Sampling frequency must be twice the highest frequency of interest, otherwise aliasing occurs causing distorted signals.  Larger FFT blocks enable finer resolution allowing for better distinction between closely spaced frequencies at the expense of time and computational power.
+
+### System Block Diagram 
+
+## Challenges
+Our group faced a multitude of difficulties during this project which lead to our final design.  As this project was highly conceptual it took several days of research along with subseqent signal processing studying in order to better understand our system. Here are the main challenges faced:
+- Pmod Troubleshooting
+- Compiling and programming
+- Magnitude Scaling
+- Windowing/Filtering
+- Packaging
+- Implementing 800x600 VGA display
+
+Regardless of these challenges it was important for us to learn how to tackle each aspect.  By iterating through each process as a group it helped to bolster some of our teamwork skills along with FPGA design and VHDL code implementation.  These challenges also helped us to learn more about different the peripheral Pmod I2S as well as the IP Catalog incorporated in Vivado.
+## Results
+## Conclusion
