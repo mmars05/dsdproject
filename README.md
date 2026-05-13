@@ -25,14 +25,34 @@ The peaks of the frequency domain indicate which frequencies are prevalent withi
 - Nexys-A7 FPGA
 - FFT IP Core
 - I2S PMOD Interface
-- VGA Monitor
+- Monitor and Cable for VGA
 - Vivado & Simulation
 - VHDL
 
 ### System Diagram 
 <img width="492" height="218" alt="Screenshot 2026-05-13 092116" src="https://github.com/user-attachments/assets/4d3b3068-f53d-4248-8981-96f9a8e54b5e" />
 
+# Setup Requirements 
 
+To setup you will need the following items:
+- PMod I2S Interface
+<img width="357" height="277" alt="Screenshot 2026-05-13 101105" src="https://github.com/user-attachments/assets/ab86744e-3bab-43b7-8147-5dc4e07b2cf9" />
+
+- VGA Connector and Cables
+<img width="528" height="331" alt="Screenshot 2026-05-13 101221" src="https://github.com/user-attachments/assets/77974089-6211-4f8c-ba6b-493c8442ef2a" />
+
+- Monitor
+<img width="197" height="149" alt="Screenshot 2026-05-13 101457" src="https://github.com/user-attachments/assets/c4256837-7e39-404c-923b-4052b4e20487" />
+
+- Nexys-A7 FPGA
+<img width="497" height="346" alt="Screenshot 2026-05-13 101311" src="https://github.com/user-attachments/assets/385e974e-900a-40d2-aefe-ba5410e0e540" />
+
+- 3.3 mm jack for computer audio
+<img width="328" height="290" alt="Screenshot 2026-05-13 101400" src="https://github.com/user-attachments/assets/925e1de5-e4d0-4dbe-9211-deea8b009297" />
+
+Once congifured to port JA on Nexys-A7 FPGA you must implement the provided code within this GitHub repository 
+# Inputs and Outputs
+**I2S**
 
 ## Challenges
 Our group faced a multitude of difficulties during this project which lead to our final design.  As this project was highly conceptual it took several days of research along with subseqent signal processing studying in order to better understand our system. Here are the main challenges faced:
@@ -57,9 +77,7 @@ Timeline
 - Week 1: Research PMOD, FFT, VGA
 - Week 2: I2S Implementation 
 - Week 3: FFT Wrapper Implemntation 
-- Week 4: Research FFT IP
-- Week 5: VGA Implementation
-- Week 6: Filtering and Debugging
-- Week 7: Final touch ups 
+- Week 4: VGA Implementation
+- Week 5: Filtering and Debugging
 
 Conclusively we are satisfied with the turnout of this project and hope that those who read it over learn more about signal processing and FPGA design.
