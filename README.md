@@ -52,7 +52,95 @@ To setup you will need the following items:
 
 Once congifured to port JA on Nexys-A7 FPGA you must implement the provided code within this GitHub repository 
 # Inputs and Outputs
-**I2S**
+
+The inputs and outputs of the FFT for each vhd are as follows:
+
+- **top**
+
+        CLK100MHZ : IN STD_LOGIC;
+        JA9, JA8, JA7 : OUT STD_LOGIC;
+        JA10 : IN STD_LOGIC;
+        VGA_red : OUT STD_LOGIC_VECTOR (3 DOWNTO 0); -- VGA outputs
+        VGA_green : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+        VGA_blue : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+        VGA_hsync : OUT STD_LOGIC;
+        VGA_vsync : OUT STD_LOGIC;
+        LED : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+
+end top;
+- **I2S**
+
+            CLK22MHZ    : in  STD_LOGIC;
+            JA9, JA8, JA7 : out STD_LOGIC;
+            JA10        : in  STD_LOGIC;
+            sample_out  : out signed(23 downto 0);
+            sample_done : out STD_LOGIC
+
+- **FFT_wrapper**
+        clk             : in  std_logic;
+        rst             : in  std_logic;
+  
+        sample_in       : in  std_logic_vector(23 downto 0);
+        sample_valid    : in  std_logic;
+        sample_ready    : out std_logic;
+    
+        fft_re_out      : out std_logic_vector(23 downto 0);
+        fft_im_out      : out std_logic_vector(23 downto 0);
+        fft_valid_out   : out std_logic;
+        fft_last_out    : out std_logic;
+        fft_ready_in    : in  std_logic := '1';
+    
+        event_frame_started    : out std_logic;
+        event_tlast_unexpected : out std_logic;
+        event_tlast_missing    : out std_logic;
+        event_status_halt      : out std_logic;
+        event_data_in_halt     : out std_logic;
+        event_data_out_halt    : out std_logic
+  
+- **vga_buffer**
+
+        clk           : in  STD_LOGIC;
+        rst           : in  STD_LOGIC;
+
+        -- FFT wrapper outputs
+        fft_re_in     : in  STD_LOGIC_VECTOR(23 downto 0);
+        fft_im_in     : in  STD_LOGIC_VECTOR(23 downto 0);
+        fft_valid_in  : in  STD_LOGIC;
+        fft_last_in   : in  STD_LOGIC;
+
+        -- buffered full FFT frame for VGA logic
+        bin_mem_out   : out fft_bin_array_t;
+        frame_done    : out STD_LOGIC
+  
+- **mag_ema_buffer**
+
+        clk        : in  STD_LOGIC;
+        rst        : in  STD_LOGIC;
+        frame_done : in  STD_LOGIC;
+        bin_in     : in  fft_bin_array_t;
+        mag_out    : out mag_array_t
+
+  
+- **vga_sync**
+
+		pixel_clk : IN STD_LOGIC;
+		red_in    : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+		green_in  : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+		blue_in   : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+		red_out   : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+		green_out : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+		blue_out  : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+		hsync     : OUT STD_LOGIC;
+		vsync     : OUT STD_LOGIC;
+		pixel_row : OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
+		pixel_col : OUT STD_LOGIC_VECTOR (10 DOWNTO 0)
+
+- **plotgen**
+  
+            vsync_plot : IN STD_LOGIC;
+            row, col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+            red, green, blue : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            data : IN mag_array_t
 
 ## Challenges
 Our group faced a multitude of difficulties during this project which lead to our final design.  As this project was highly conceptual it took several days of research along with subseqent signal processing studying in order to better understand our system. Here are the main challenges faced:
