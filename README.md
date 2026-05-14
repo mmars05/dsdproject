@@ -68,6 +68,10 @@ The inputs and outputs of the FFT for each vhd are as follows:
         LED : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
 
 end top;
+
+This VHDL module acts as the central coordinator for our real-time audio spectrum visualizer.  It effectively translates the raw sound wave data into a visual representation.  The architecture of this file establishes a pipeline that ingests 24-bit audio samples through an I2S interface, processes them via a Fast Fourier Transform IP to identifty corresponding frequency components and then smooth the results with an exponential moving averager (EMA) filter to ensure that the display looks adequate.  These processed magnitudes are then handed off to a plot generator and vga synchronization logic module that works in tandem to render frequency bars on a monitor at correct pixel coordinates. 
+
+
 - **I2S**
 
             CLK22MHZ    : in  STD_LOGIC;
@@ -75,6 +79,8 @@ end top;
             JA10        : in  STD_LOGIC;
             sample_out  : out signed(23 downto 0);
             sample_done : out STD_LOGIC
+
+This VHDL moduels job is to implement the I2S2 protocol to recieve serial digital audio and conver it into a format that the rest of our FPGA can process. The code uses a single 22MHz input clock and a counter to derive the timing for the entire audio interface with JA7 for passing the 22 Mhz clock to external audio peripheral, JA9 for the SCK bit clock, and JA8 being the word select or LRCLK that toggles whether the data belong to the left or right channel of the PMOD peripheral.
 
 - **FFT_wrapper**
         clk             : in  std_logic;
@@ -96,6 +102,8 @@ end top;
         event_status_halt      : out std_logic;
         event_data_in_halt     : out std_logic;
         event_data_out_halt    : out std_logic
+
+This module manages the high-speed processing of the audio data from the I2S by wrapping a 256 point FFT IP core with custom control and preprocessing logic.  It implements a fsm that transitions from hardware configuration to a data collection phase where the incoming 24-bit audio samples are multiplied by a Hanning window coefficent to minimize spectral leakage and improve frequency accuracy.  Once a full frame of 256 samples is buffered the module streams the data into the FFT core at 100 Mhz using the AXI-Stream protocol.  This ensures that the FFT core recieves the data packets for accurate real-time frequency analysis.
   
 - **vga_buffer**
 
@@ -111,6 +119,8 @@ end top;
         -- buffered full FFT frame for VGA logic
         bin_mem_out   : out fft_bin_array_t;
         frame_done    : out STD_LOGIC
+
+This module serves as a synchronization fram buffer that captures and scales high-speed frequency data from the FFT core for the visulization stage including the VGA.  It stores the 256 complex frequency bins into an internal memory array performing a six-bit shift to the right on both the real and imaginary components to normalize the data and prevent overflow.  Then we concatenate these scaled components into a single 48-bit storage and ensures that the downstream VGA logic provides a stable processed audio spectrum. 
   
 - **mag_ema_buffer**
 
@@ -119,6 +129,8 @@ end top;
         frame_done : in  STD_LOGIC;
         bin_in     : in  fft_bin_array_t;
         mag_out    : out mag_array_t
+
+This module transforms the raw frequency data into a smooth output for our display spectrum.  Upon receiving a completed FFT frame it will iterate through each bin in order to estimate the signal magnitude by identifying the maximum absoulte value of the real and imaginary components for an approximation.  It also applies a exponential moving averager which is a filter that smoothes out the data and helps to create the bars on the screen. 
 
   
 - **vga_sync**
@@ -135,12 +147,16 @@ end top;
 		pixel_row : OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
 		pixel_col : OUT STD_LOGIC_VECTOR (10 DOWNTO 0)
 
+This serves as a VGA timing controller which is configured to a 800x600 resolution.  It manages a high-speed pixel clock and maintains two internal counters that track an electron beams position based on h_sync and v_sync signal pulses that are needed in order to stabilize each frame.  It includes a front and back porch and well as two sync signals that can act as a bridge for RBG data when horizontal and vertical data is high.  It also provides pixel coordinates to tell the graphic module exactly where on the screen pixels are being drawn.
+
 - **plotgen**
   
             vsync_plot : IN STD_LOGIC;
             row, col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             red, green, blue : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             data : IN mag_array_t
+
+The final module serves as a graphic rendering for the FFT display.  It ensures a stable image that synchronizes the data updates with vsync for each frame.  The rendering logic centers the visulaization horizontally and maps each frequency bin to a two pixel wide column scaling the 24 bit magnitude data to fit the monitors 600-pixel resolution.  It also compares the current pixel row and column and draws green spectral bars that grow upward from the bottom of the screen.
 
 ## Challenges
 Our group faced a multitude of difficulties during this project which lead to our final design.  As this project was highly conceptual it took several days of research along with subseqent signal processing studying in order to better understand our system. Here are the main challenges faced:
