@@ -7,6 +7,8 @@ For our final project our group chose to work in the signal processing realm and
 
 <img width="2880" height="2160" alt="IMG_5173" src="https://github.com/user-attachments/assets/6290ad85-49ea-4c58-a092-762d0feacd34" />
 
+<img width="2880" height="2160" alt="fft_fpga_setup" src="https://github.com/user-attachments/assets/112472fa-0152-438c-a419-663fdcc6b8d3" />
+
 **What is an FFT?**
 
 The fast-fourier transform is a fundamental mathematical technique used in, but not limited to, signal processing, data analysis and image processing.  The FFT is an algorithm for transforming time-domain data into its frequency-domain representation.  The FFT allows engineers to analyze frequency components of a signal. 
